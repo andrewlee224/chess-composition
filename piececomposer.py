@@ -1,3 +1,7 @@
+import math
+import logging
+from collections import deque
+
 import pieces as pcs
 import chessboard as csb
 
@@ -15,18 +19,27 @@ class PieceComposer(object):
             PieceClass(sort_order=self.DEFAULT_COMPOSE_ORDER.index(PieceClass))
             for PieceClass in piece_types
         ]
-        
-        self.pieces.sort(key=lambda piece: piece.sort_order, reverse=True)
-        self.used_pieces = []
+
+        self.pieces = deque(sorted(self.pieces, key=lambda piece: piece.sort_order, reverse=True))
+        self.used_pieces = deque([])
 
         self.found_compositions = set()
 
+        self.recursions_completed = -1
+        self.total_recursions = (
+            math.factorial(len(self.pieces)) * self.chessboard._num_fields)
+
     def find_composition(self):
-        #import pdb
-        #pdb.set_trace()
-        print("\n===== Entering find_composition")
-        print("Left pieces: {}".format(self.pieces))
-        print("Used pieces: {}".format(self.used_pieces))
+        logging.debug("\n===== Entering find_composition")
+        logging.debug("Left pieces: {}".format(self.pieces))
+        logging.debug("Used pieces: {}".format(self.used_pieces))
+        
+        self.recursions_completed += 1
+        if (self.recursions_completed % 100) == 0:
+            print("Completed {:.2%}".format(
+                self.recursions_completed/float(self.total_recursions)
+            ))
+
         if not self.pieces:
             self.found_compositions.add(
                 self.extract_composition(self.chessboard)
@@ -39,24 +52,16 @@ class PieceComposer(object):
 
         for j in range(self.chessboard._rows):
             for i in range(self.chessboard._cols):
-                print("Considering {}, {}, {}".format(self.pieces[-1], j, i))
+                logging.debug("Considering {} at {}, {}".format(self.pieces[-1], j, i))
                 if (j, i) in self.chessboard.blocked_positions:
-                    if (j, i) == (1, 0):
-                        print("At 1,0: ")
-                        print("threatened_positions: {}".format(
-                            self.chessboard.threatened_positions))
-                        print("threatened_dict: {}".format(
-                            self.chessboard.threatened_dict))
-                        print("occupied positions: {}".format(
-                            self.chessboard.occupied_positions))
-                    print("\tPosition blocked")
+                    logging.debug("\tPosition blocked")
                     continue
                 if not self.pieces:
-                    print("\tNo remaining pieces")
+                    logging.debug("\tNo remaining pieces")
                     continue
                 add_status = self.chessboard.add(self.pieces[-1], (j, i))
                 if add_status:
-                    print("Added {} on {}, {}".format(self.pieces[-1], j, i))
+                    logging.debug("Added {} on {}, {}".format(self.pieces[-1], j, i))
                     piece = self.pieces.pop()
                     self.used_pieces.append(piece)
 
@@ -66,18 +71,10 @@ class PieceComposer(object):
                         # self.pieces = reversed(self.used_pieces)
                     #else:
                     self.find_composition()
-                    print("=== Returned from find_composition")
+                    logging.debug("=== Returned from find_composition")
                     last_piece = self.used_pieces.pop()
                     self.pieces.append(last_piece)
-                    print("threatened_dict[(1, 0)] before remove: {}".format(
-                        self.chessboard.threatened_dict[(1, 0)]))
-                    print("occupied_positions before remove: {}".format(
-                        self.chessboard.occupied_positions))
                     self.chessboard.remove(last_piece)
-                    print("occupied_positions after remove: {}".format(
-                        self.chessboard.occupied_positions))
-                    print("threatened_dict after remove: {}".format(
-                        self.chessboard.threatened_dict[(1, 0)]))
 
                 #else:
                 #    self.pieces.append(self.used_pieces.pop())
