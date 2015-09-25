@@ -20,7 +20,10 @@ class PieceComposer(object):
             for PieceClass in piece_types
         ]
 
-        self.pieces = deque(sorted(self.pieces, key=lambda piece: piece.sort_order, reverse=True))
+        self.pieces = deque(
+            sorted(
+                self.pieces, key=lambda piece: piece.sort_order, reverse=True)
+        )
         self.used_pieces = deque([])
 
         self.found_compositions = set()
@@ -33,7 +36,7 @@ class PieceComposer(object):
         logging.debug("\n===== Entering find_composition")
         logging.debug("Left pieces: {}".format(self.pieces))
         logging.debug("Used pieces: {}".format(self.used_pieces))
-        
+
         self.recursions_completed += 1
         if (self.recursions_completed % 100) == 0:
             print("Completed {:.2%}".format(
@@ -44,15 +47,13 @@ class PieceComposer(object):
             self.found_compositions.add(
                 self.extract_composition(self.chessboard)
             )
-            #last_piece = self.used_pieces.pop()
-            #self.pieces.append(last_piece)
-            #self.chessboard.remove(last_piece)
 
             return
 
         for j in range(self.chessboard._rows):
             for i in range(self.chessboard._cols):
-                logging.debug("Considering {} at {}, {}".format(self.pieces[-1], j, i))
+                logging.debug("Considering {} at {}, {}".format(
+                    self.pieces[-1], j, i))
                 if (j, i) in self.chessboard.blocked_positions:
                     logging.debug("\tPosition blocked")
                     continue
@@ -61,45 +62,22 @@ class PieceComposer(object):
                     continue
                 add_status = self.chessboard.add(self.pieces[-1], (j, i))
                 if add_status:
-                    logging.debug("Added {} on {}, {}".format(self.pieces[-1], j, i))
+                    logging.debug(
+                        "Added {} on {}, {}".format(self.pieces[-1], j, i))
                     piece = self.pieces.pop()
                     self.used_pieces.append(piece)
 
-                    # self.used_pieces.append(piece)
-                    # if no more pieces left to put
-                    #if not self.pieces:
-                        # self.pieces = reversed(self.used_pieces)
-                    #else:
                     self.find_composition()
                     logging.debug("=== Returned from find_composition")
                     last_piece = self.used_pieces.pop()
                     self.pieces.append(last_piece)
                     self.chessboard.remove(last_piece)
 
-                #else:
-                #    self.pieces.append(self.used_pieces.pop())
-
-    def find_composition_rec(self):
-        
-        if len(self.used_pieces) == len(self.pieces):
-            self.found_compositions.add(
-                self.extract_composition(self.chessboard))
-
-        if self.examined_fields == self.chessboard.num_fields:
-            return
-
-        # examine fields row by row
-        # examined_field = 
-
-    # @staticmethod
-    # def find_composition(chessboard, 
-
     @staticmethod
     def extract_composition(chessboard):
         composition = frozenset({
-            (piece.__class__, piece.position[0], piece.position[1]) 
+            (piece.__class__, piece.position[0], piece.position[1])
             for piece in chessboard.pieces
         })
 
         return composition
-
