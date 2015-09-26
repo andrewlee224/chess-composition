@@ -41,6 +41,7 @@ class Piece(object):
 
     @property
     def possible_moves(self):
+        """Lazily evaluate and cache possible moves of a piece."""
         if self.bound_chessboard is None or self.position is None:
             return None
         if self._possible_moves is not None:
@@ -48,14 +49,19 @@ class Piece(object):
 
         self._possible_moves = self.compute_possible_moves(
             self.position,
-            self.bound_chessboard._rows,
-            self.bound_chessboard._cols
+            self.bound_chessboard.rows,
+            self.bound_chessboard.cols
         )
 
         return self._possible_moves
 
     @property
     def blocked_moves(self):
+        """Get positions at which other pieces cannot be put.
+
+        The blocked positions are positions which are threatened by the
+        piece and the occupied position.
+        """
         if self.position is None:
             return None
 
@@ -63,10 +69,7 @@ class Piece(object):
 
     @classmethod
     def compute_possible_moves(cls, pos, csb_rows, csb_cols):
-        """Compute possible absolute coordinates of a
-        given piece position and chessboard dimensions
-
-        """
+        """Compute possible absolute coordinates of moves for a piece."""
         y, x = pos
 
         possible_moves = set()
@@ -75,14 +78,15 @@ class Piece(object):
             if not scale:
                 # check if position not out of chessboard bounds
                 x_candidate, y_candidate = x + rel_x, y + rel_y
-                if not (x_candidate < csb_cols and y_candidate < csb_rows):
+                if not (0 <= x_candidate < csb_cols
+                        and 0 <= y_candidate < csb_rows):
                     continue
                 possible_moves.add((y_candidate, x_candidate))
             else:
                 # scale the move until out of bounds
                 out_of_bounds = False
                 factor = 1
-                while(not out_of_bounds):
+                while not out_of_bounds:
                     x_candidate, y_candidate = (
                         x + rel_x*factor, y + rel_y*factor)
                     if not (0 <= x_candidate < csb_cols
@@ -96,6 +100,7 @@ class Piece(object):
 
 
 class Bishop(Piece):
+    """Represents Bishop piece."""
 
     NAME = "Bishop"
 
@@ -106,6 +111,7 @@ class Bishop(Piece):
 
 
 class Rook(Piece):
+    """Represents Rook piece."""
 
     NAME = "Rook"
 
@@ -116,6 +122,7 @@ class Rook(Piece):
 
 
 class Queen(Piece):
+    """Represents Queen piece."""
 
     NAME = "Queen"
 
@@ -123,6 +130,7 @@ class Queen(Piece):
 
 
 class Knight(Piece):
+    """Represents Knight piece."""
 
     NAME = "Knight"
 
@@ -135,6 +143,7 @@ class Knight(Piece):
 
 
 class King(Piece):
+    """Represents King piece."""
 
     NAME = "King"
 
