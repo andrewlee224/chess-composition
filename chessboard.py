@@ -1,4 +1,5 @@
 from collections import defaultdict
+import itertools
 
 
 class Chessboard(object):
@@ -31,7 +32,13 @@ class Chessboard(object):
         self._blocked_positions = set()
         self._rows = rows
         self._cols = cols
+        self._is_square = (rows == cols)
         self._num_fields = rows*cols
+        self._opt_rows = (rows+1)/2 if self._is_square else rows
+        self._opt_cols = (cols+1)/2 if self._is_square else cols
+        self._free_fields = set(itertools.product(
+            *[range(self._rows), range(self._cols)])
+        )
         self.add_threatened = add_threatened
 
     @property
@@ -85,4 +92,3 @@ class Chessboard(object):
         piece.reset()
 
         return True
-
