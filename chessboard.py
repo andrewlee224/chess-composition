@@ -1,9 +1,10 @@
+"""Module containing objects for modeling the chessboard."""
+
 from collections import defaultdict
-import itertools
 
 
 class Chessboard(object):
-    """Represents chessboard
+    """Represents chessboard.
 
     The chessboard positions are accessed using a (row, column) convention
     as is customary with matrices. The zeroth row is the top row, and the
@@ -34,22 +35,53 @@ class Chessboard(object):
         self._cols = cols
         self._is_square = (rows == cols)
         self._num_fields = rows*cols
+
+        # number of checked rows in square chessboards
+        # in the top recursive calls - this results in approx. 4x speedup
         self._opt_rows = (rows+1)/2 if self._is_square else rows
         self._opt_cols = (cols+1)/2 if self._is_square else cols
-        self._free_fields = set(itertools.product(
-            *[range(self._rows), range(self._cols)])
-        )
+
         self.add_threatened = add_threatened
 
     @property
+    def rows(self):
+        return self._rows
+
+    @property
+    def cols(self):
+        return self._cols
+
+    @property
+    def opt_rows(self):
+        return self._opt_rows
+
+    @property
+    def opt_cols(self):
+        return self._opt_cols
+
+    @property
+    def is_square(self):
+        return self._is_square
+
+    @property
+    def num_fields(self):
+        return self._num_fields
+
+    @property
     def blocked_positions(self):
+        """Get both currently occupied and threatened positions."""
         if not self.add_threatened:
             return self.occupied_positions.union(self.threatened_positions)
 
         return self.occupied_positions
 
     def add(self, piece, pos):
+        """Add a chess piece to a chessboard.
 
+        This takes care of calculating the new threatened and occupied
+        positions on the chessboard and returns True or False depending
+        if addition succeeded or failed
+        """
         if pos in self.occupied_positions:
             return False
 
@@ -79,6 +111,11 @@ class Chessboard(object):
         return True
 
     def remove(self, piece):
+        """Remove a chess piece from the chessboard.
+
+        As with 'add' this takes care of computing the new
+        occupied and blocked positions.
+        """
         if piece not in self.pieces:
             return False
 
