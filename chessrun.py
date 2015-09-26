@@ -1,6 +1,7 @@
 """Module for running the app"""
 
 
+from __future__ import print_function
 import argparse
 
 import piececomposer as composer
@@ -17,11 +18,12 @@ PIECE_CLASSES = {
 
 
 def setup_args():
+    """Set up parse arguments."""
     parser = argparse.ArgumentParser(
         description="""
         Find non-threatening chess piece compositions.
 
-        Pieces are specified by supplying the number of pieces (1-9) and 
+        Pieces are specified by supplying the number of pieces (1-9) and
         the piece letter.
         K - King
         Q - Queen
@@ -50,8 +52,6 @@ def setup_args():
 
     piece_types = []
     for part in args.pieces:
-        #import ipdb
-        #ipdb.set_trace()
         if not len(part) == 2:
             print("Only two characters per piece declaration are allowed")
             return False
@@ -69,15 +69,15 @@ def setup_args():
         part_list = [PieceClass] * count
         piece_types.extend(part_list)
 
-    return args.rows, args.cols, piece_types
+    return (args.rows, args.cols, piece_types)
 
 
 def main():
+    """Main function."""
     arguments = setup_args()
 
-    if not arguments:
+    if arguments is False:
         return
-
     rows, cols, piece_types = arguments
 
     piece_composer = composer.PieceComposer(

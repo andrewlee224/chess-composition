@@ -63,13 +63,13 @@ def main():
     """Main benchmark function."""
     piece_composer = composer.PieceComposer(**BENCH_PARAMS4)
 
-    t0 = time.time()
+    time0 = time.time()
 
     piece_composer.compute()
 
-    t1 = time.time()
+    time1 = time.time()
 
-    print("Found compositions in {}".format(t1 - t0))
+    print("Found compositions in {}".format(time1 - time0))
     print(
         "Number of found compositions: {}".format(
             len(piece_composer.found_compositions))
