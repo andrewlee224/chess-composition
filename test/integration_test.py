@@ -1,7 +1,13 @@
+import sys
+import os
+# workaround to make possible running test files without
+# nosetests test runner
+sys.path.insert(0, os.path.abspath(__file__ + "/../.."))
+
 import nose.tools as nt
 
-from .. import pieces as pcs
-from .. import piececomposer as comp
+import pieces as pcs
+import piececomposer as comp
 
 
 def integration_3x3_test():
