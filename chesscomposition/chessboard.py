@@ -34,7 +34,6 @@ class Chessboard(object):
         self._rows = rows
         self._cols = cols
         self._is_square = (rows == cols)
-        self._num_fields = rows*cols
 
         # number of checked rows in square chessboards
         # in the top recursive calls - this results in approx. 4x speedup
@@ -62,10 +61,6 @@ class Chessboard(object):
     @property
     def is_square(self):
         return self._is_square
-
-    @property
-    def num_fields(self):
-        return self._num_fields
 
     @property
     def blocked_positions(self):
