@@ -55,18 +55,6 @@ class Piece(object):
 
         return self._possible_moves
 
-    @property
-    def blocked_moves(self):
-        """Get positions at which other pieces cannot be put.
-
-        The blocked positions are positions which are threatened by the
-        piece and the occupied position.
-        """
-        if self.position is None:
-            return None
-
-        return self.possible_moves + self.position
-
     @classmethod
     def compute_possible_moves(cls, pos, csb_rows, csb_cols):
         """Compute possible absolute coordinates of moves for a piece."""
